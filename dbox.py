@@ -35,8 +35,19 @@ def draw_rectangle(event,x,y,flags,param):
 
 def format(box, shape , f = 1):
 
+	# vision api
+	if f == 2:
+		if box == '':
+			return ''
+		x,y,w,h = box.split(' ')
+		x = float(x)
+		y = float(y)
+		w = float(w)
+		h = float(h)
+		H,W,_ = shape 
+		return str(x/W) + ',' + str(y/H) + ',,,' + str((x+w)/W) + ',' +str((y+h)/H)
+	elif f == 1:
 	#yolo format 
-	if f == 1:
 		if box == '':
 			return ''
 		x,y,w,h = box.split(' ')
@@ -85,9 +96,10 @@ def start(dirc , fact = 1.0):
 			curr_txt = txtf[indx]
 			dot_ind = curr_txt.find('.')
 			txt = curr_txt[:dot_ind]+'.txt'
-			with open(txt,'w') as f:
-				f.write(format(box,im.shape,f=fmt))
-			print('saving to ',txt)
+			print('TRAIN,' + os.path.basename(curr_txt) + ',label,' + format(box,im.shape,f=fmt) + ',,')
+			with open('dataset.csv','a') as f:
+				f.write('TRAIN,' + os.path.basename(curr_txt) + ',label,' + format(box,im.shape,f=fmt) + ',,\n')
+			#print('saving to ',txt)
 
 		#use [=>] to move to next image 
 		if k == 109:
@@ -98,9 +110,9 @@ def start(dirc , fact = 1.0):
 				img_res = cv2.resize(im.copy(), (0,0), fx=f_x, fy=f_y) 
 				img_cpy = img_res.copy()
 				box =''
-				print('Processing next image ')
-			else:
-				print('No next image')
+				#print('Processing next image ')
+			#else:
+			#	print('No next image')
 
 		#use [<=] to move to previous image 
 		if k == 110:
@@ -110,9 +122,7 @@ def start(dirc , fact = 1.0):
 				img_res = cv2.resize(im.copy(), (0,0), fx=f_x, fy=f_y) 
 				img_cpy = img_res.copy()
 				box=''
-				print('Processing previous image ')
-			else:
-				print('no previous image')
+
 		#use [ESC] to exit
 		if k == 27:
 			break
